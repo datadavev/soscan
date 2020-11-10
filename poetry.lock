@@ -1102,6 +1102,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 six = "*"
 
 [[package]]
+name = "psycopg2"
+version = "2.8.6"
+description = "psycopg2 - Python-PostgreSQL Database Adapter"
+category = "main"
+optional = false
+python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
+
+[[package]]
 name = "ptyprocess"
 version = "0.6.0"
 description = "Run a subprocess in a pseudo terminal"
@@ -1738,7 +1746,7 @@ name = "sqlalchemy"
 version = "1.3.20"
 description = "Database Abstraction Library"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.extras]
@@ -1926,7 +1934,7 @@ docs = ["numpy", "sphinx", "graphviz", "pandoc", "sphinx-material", "sphinxcontr
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "64849aed3e8bcd7f4b029ad3bbddac8c006d0266506ab6c55709bf3e6226007b"
+content-hash = "33dc2053f38c52c6de9a38f3760fe944d675dd5ed09e4ec88be248c3d52d51ba"
 
 [metadata.files]
 alabaster = [
@@ -2505,6 +2513,21 @@ prompt-toolkit = [
 ]
 protego = [
     {file = "Protego-0.1.16.tar.gz", hash = "sha256:a682771bc7b51b2ff41466460896c1a5a653f9a1e71639ef365a72e66d8734b4"},
+]
+psycopg2 = [
+    {file = "psycopg2-2.8.6-cp27-cp27m-win32.whl", hash = "sha256:068115e13c70dc5982dfc00c5d70437fe37c014c808acce119b5448361c03725"},
+    {file = "psycopg2-2.8.6-cp27-cp27m-win_amd64.whl", hash = "sha256:d160744652e81c80627a909a0e808f3c6653a40af435744de037e3172cf277f5"},
+    {file = "psycopg2-2.8.6-cp34-cp34m-win32.whl", hash = "sha256:b8cae8b2f022efa1f011cc753adb9cbadfa5a184431d09b273fb49b4167561ad"},
+    {file = "psycopg2-2.8.6-cp34-cp34m-win_amd64.whl", hash = "sha256:f22ea9b67aea4f4a1718300908a2fb62b3e4276cf00bd829a97ab5894af42ea3"},
+    {file = "psycopg2-2.8.6-cp35-cp35m-win32.whl", hash = "sha256:26e7fd115a6db75267b325de0fba089b911a4a12ebd3d0b5e7acb7028bc46821"},
+    {file = "psycopg2-2.8.6-cp35-cp35m-win_amd64.whl", hash = "sha256:00195b5f6832dbf2876b8bf77f12bdce648224c89c880719c745b90515233301"},
+    {file = "psycopg2-2.8.6-cp36-cp36m-win32.whl", hash = "sha256:a49833abfdede8985ba3f3ec641f771cca215479f41523e99dace96d5b8cce2a"},
+    {file = "psycopg2-2.8.6-cp36-cp36m-win_amd64.whl", hash = "sha256:f974c96fca34ae9e4f49839ba6b78addf0346777b46c4da27a7bf54f48d3057d"},
+    {file = "psycopg2-2.8.6-cp37-cp37m-win32.whl", hash = "sha256:6a3d9efb6f36f1fe6aa8dbb5af55e067db802502c55a9defa47c5a1dad41df84"},
+    {file = "psycopg2-2.8.6-cp37-cp37m-win_amd64.whl", hash = "sha256:56fee7f818d032f802b8eed81ef0c1232b8b42390df189cab9cfa87573fe52c5"},
+    {file = "psycopg2-2.8.6-cp38-cp38-win32.whl", hash = "sha256:ad2fe8a37be669082e61fb001c185ffb58867fdbb3e7a6b0b0d2ffe232353a3e"},
+    {file = "psycopg2-2.8.6-cp38-cp38-win_amd64.whl", hash = "sha256:56007a226b8e95aa980ada7abdea6b40b75ce62a433bd27cec7a8178d57f4051"},
+    {file = "psycopg2-2.8.6.tar.gz", hash = "sha256:fb23f6c71107c37fd667cb4ea363ddeb936b348bbd6449278eb92c189699f543"},
 ]
 ptyprocess = [
     {file = "ptyprocess-0.6.0-py2.py3-none-any.whl", hash = "sha256:d7cc528d76e76342423ca640335bd3633420dc1366f258cb31d05e865ef5ca1f"},

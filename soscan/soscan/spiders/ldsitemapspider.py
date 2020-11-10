@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 class LDSitemapSpider(Spider):
 
+    name = "LDSitemapSpider"
     sitemap_urls = ()
     sitemap_rules = [("", "parse")]
     sitemap_follow = [""]

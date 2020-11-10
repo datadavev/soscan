@@ -1,0 +1,57 @@
+# soscan
+
+Spider for scanning and retrieving schema.org content.
+
+Extracted schema.org markup is stored to postgres as a `JSONB` field in
+a single table `socontent`. Document URL is used as the primary key.
+
+
+## Installation
+
+Dependencies:
+
+* link:https://www.python.org/[Python >= 3.8]
+* link:https://python-poetry.org/docs/#installation[Poetry >= 1.1.4]
+* link:https://www.postgresql.org/[Postgres >= 11]
+
+Complete python dependencies are listed in `pyproject.toml`.
+
+Note: installing psycopg2 on OS X can be a bit cumbersome. With a brew
+installed postgresql, this worked for me:
+
+----
+env LDFLAGS='-L/usr/local/lib -L/usr/local/opt/openssl/lib -L/usr/local/opt/readline/lib' poetry add psycopg2
+----
+
+Installing and setting up the scanner involves getting the source,
+creating a target database, and configuration.
+
+Getting the source:
+
+----
+git clone https://github.com/datadavev/soscan.git
+cd soscan
+poetry install
+----
+
+Creating the database:
+----
+psql
+CREATE DATABASE soscan;
+CREATE USER soscanrw;
+GRANT ALL PRIVILEGES ON DATABASE soscan TO soscanrw;
+----
+
+Configuration:
+----
+----
+
+## Operation
+
+
+## Development
+
+TODO:
+
+* normalize extracted SO
+* restart interrupted scan

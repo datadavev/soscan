@@ -9,4 +9,9 @@ import scrapy
 class SoscanItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    url = scrapy.Field()
+    status = scrapy.Field()
+    time_retrieved = scrapy.Field()
+    time_loc = scrapy.Field()
+    time_header = scrapy.Field()
+    jsonld = scrapy.Field()
