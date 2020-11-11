@@ -18,7 +18,8 @@ Dependencies:
 
 Complete python dependencies are listed in `pyproject.toml`.
 
-Note: installing psycopg2 on OS X can be a bit cumbersome. With a brew
+[NOTE]
+Installing psycopg2 on OS X can be a bit cumbersome. With a brew
 installed postgresql, this worked for me:
 
 ----
@@ -44,6 +45,29 @@ CREATE USER soscanrw;
 GRANT ALL PRIVILEGES ON DATABASE soscan TO soscanrw;
 ----
 
+The database schema is applied on first run, with a single table created:
+
+----
+                          Table "public.socontent"
+     Column     |           Type           | Collation | Nullable | Default
+----------------+--------------------------+-----------+----------+---------
+ url            | character varying        |           | not null |
+ time_loc       | timestamp with time zone |           |          |
+ time_header    | timestamp with time zone |           |          |
+ time_retrieved | timestamp with time zone |           |          |
+ http_status    | integer                  |           |          |
+ jsonld         | jsonb                    |           |          |
+Indexes:
+    "socontent_pkey" PRIMARY KEY, btree (url)
+----
+
+The `jsonld` field holds the normalized JSON-LD retrieved from the page at `url`.
+
+[NOTE]
+It is not particularly efficient to search the jsonld column (it's ok
+for a few hundred thousand entries). An application reliant on performant
+search against values in the jsonld would benefit from appropriate
+normalization of the content.
 
 ## Operation
 
@@ -63,8 +87,7 @@ scrapy crawl JsonldSpider \
 
 ### Query notes
 
-Note that the following are all working on the first `@graph` in the jsonld. The
-number of entries in `@graph` can be found by:
+The number of entries in `@graph` can be found by:
 
 ----
 select count(*), jsonb_array_length(jsonld->'@graph') as G from socontent group by G;
@@ -74,10 +97,13 @@ select count(*), jsonb_array_length(jsonld->'@graph') as G from socontent group 
    782 | 1
 ----
 
+[NOTE]
+The following examples all work on the first `@graph` in the jsonld.
+
 Types of things that we collected:
 
 ----
-select count(*),  jsonld->'@graph'->0->'@type' as T
+select count(*), jsonld->'@graph'->0->'@type' as T
   from socontent
   group by T
   order by T;
