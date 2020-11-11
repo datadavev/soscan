@@ -56,7 +56,7 @@ The database schema is applied on first run, with a single table created:
 ----------------+--------------------------+-----------+----------+---------
  url            | character varying        |           | not null |
  time_loc       | timestamp with time zone |           |          |
- time_header    | timestamp with time zone |           |          |
+ time_modified  | timestamp with time zone |           |          |
  time_retrieved | timestamp with time zone |           |          |
  http_status    | integer                  |           |          |
  jsonld         | jsonb                    |           |          |

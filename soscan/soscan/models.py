@@ -26,7 +26,7 @@ class SOContent(Base):
         nullable=True,
         doc="Loc timestamp in sitemap",
     )
-    time_header = sqlalchemy.Column(
+    time_modified = sqlalchemy.Column(
         sqlalchemy.DateTime(timezone=True),
         default=None,
         nullable=True,
@@ -54,6 +54,8 @@ class SOContent(Base):
         return {
             "url": self.url,
             "time_retrieved": soscan.utils.datetimeToJsonStr(self.time_retrieved),
+            "time_loc":soscan.utils.datetimeToJsonStr(self.time_loc),
+            "time_modified":soscan.utils.datetimeToJsonStr(self.time_modified),
             "http_status": self.http_status,
             "jsonld": self.jsonld,
         }

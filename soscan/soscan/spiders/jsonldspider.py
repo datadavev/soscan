@@ -35,11 +35,11 @@ class JsonldSpider(soscan.spiders.ldsitemapspider.LDSitemapSpider):
                     response.meta["loc_timestamp"],
                     settings={"RETURN_AS_TIMEZONE_AWARE": True},
                 )
-                item["time_header"] = None
-                response_date = response.headers.get("Date", None)
+                item["time_modified"] = None
+                response_date = response.headers.get("Last-Modified", None)
                 if response_date is not None:
                     try:
-                        item["time_header"] = email.utils.parsedate_to_datetime(
+                        item["time_modified"] = email.utils.parsedate_to_datetime(
                             response_date.decode()
                         )
                     except Exception as e:

@@ -72,6 +72,7 @@ class SoscanNormalizePipeline:
 class SoscanPersistPipeline:
     def __init__(self, db_url):
         self.db_url = db_url
+        self.merge_existing = True
         self.logger = logging.getLogger("SoscanPersist")
         self._engine = None
         self._session = None
@@ -101,12 +102,18 @@ class SoscanPersistPipeline:
                 http_status=item["status"],
                 time_retrieved=item["time_retrieved"],
                 time_loc=item["time_loc"],
-                time_header=item["time_header"],
+                time_modified=item["time_modified"],
                 jsonld=item["jsonld"],
             )
             exists = self._session.query(soscan.models.SOContent).get(soitem.url)
             if exists:
                 self.logger.debug("EXISTING content: %s", soitem.url)
+                if self.merge_existing:
+                    try:
+                        merged = self._session.merge(soitem)
+                        self._session.commit()
+                    except Exception as e:
+                        self.logger.warning("Could not merge '%s' because %s", soitem.url, e)
             else:
                 self.logger.debug("NEW content: %s", soitem.url)
                 try:

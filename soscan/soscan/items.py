@@ -13,5 +13,5 @@ class SoscanItem(scrapy.Item):
     status = scrapy.Field()
     time_retrieved = scrapy.Field()
     time_loc = scrapy.Field()
-    time_header = scrapy.Field()
+    time_modified = scrapy.Field()
     jsonld = scrapy.Field()
