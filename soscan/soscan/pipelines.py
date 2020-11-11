@@ -14,44 +14,40 @@ import soscan.models
 import pyld.jsonld
 import scrapy.exceptions
 
-SO_HTTP_CONTEXT = {
-    "@context":{
-        "@vocab":"http://schema.org/"
-    }
-}
-SO_HTTPS_CONTEXT = {
-    "@context":{
-        "@vocab":"https://schema.org/"
-    }
-}
+SO_HTTP_CONTEXT = {"@context": {"@vocab": "http://schema.org/"}}
+SO_HTTPS_CONTEXT = {"@context": {"@vocab": "https://schema.org/"}}
 
 CONTEXT_CACHE = {}
 
-def cachingDocumentLoader(url):
+
+def cachingDocumentLoader(url, options={}):
     loader = pyld.jsonld.requests_document_loader()
     if url in CONTEXT_CACHE:
         return CONTEXT_CACHE[url]
-    resp = loader(url)
+    resp = loader(url, options=options)
     CONTEXT_CACHE[url] = resp
     return resp
 
+
 pyld.jsonld.set_document_loader(cachingDocumentLoader)
 
-class SoscanNormalizePipeline:
 
+class SoscanNormalizePipeline:
     def __init__(self):
         self.logger = logging.getLogger("SoscanNormalize")
         self._processor = pyld.jsonld.JsonLdProcessor()
 
     def process_item(self, item, spider):
         self.logger.debug("process_item: %s", item["url"])
-        result = self.normalizeSchemaOrg( item['jsonld'] )
+        result = self.normalizeSchemaOrg(item["jsonld"])
         if not result is None:
-            item['jsonld'] = result
+            item["jsonld"] = result
             return item
-        raise scrapy.exceptions.DropItem(f"JSON-LD normalization failed for document: %s", item['jsonld'])
+        raise scrapy.exceptions.DropItem(
+            f"JSON-LD normalization failed for document: %s", item["jsonld"]
+        )
 
-    def normalizeSchemaOrg(self, source ):
+    def normalizeSchemaOrg(self, source):
         try:
             options = None
             expanded = self._processor.expand(source, options)
@@ -59,20 +55,17 @@ class SoscanNormalizePipeline:
             # Context document should not be modified in the .compact method, but it is
             # Send a copy of the context instead of the original.
             normalized = self._processor.compact(
-                expanded,
-                copy.deepcopy(SO_HTTP_CONTEXT),
-                {"graph": True}
+                expanded, copy.deepcopy(SO_HTTP_CONTEXT), {"graph": True}
             )
             # Switch the namespace to use https
             normalized["@context"]["@vocab"] = "https://schema.org/"
             finalized = self._processor.compact(
-                normalized,
-                copy.deepcopy(SO_HTTPS_CONTEXT),
-                {"graph": True}
+                normalized, copy.deepcopy(SO_HTTPS_CONTEXT), {"graph": True}
             )
             return finalized
         except Exception as e:
             self.logger.error("Normalize failed: %s", e)
+            self.logger.error("Cache: %s", CONTEXT_CACHE)
         return None
 
 
@@ -94,7 +87,7 @@ class SoscanPersistPipeline:
         if self._engine is None:
             return
         self._session = soscan.models.getSession(self._engine)
-        #TODO: check in database for most recent date of entry
+        # TODO: check in database for most recent date of entry
 
     def close_spider(self, spider):
         self.logger.debug("close_spider")
@@ -107,8 +100,8 @@ class SoscanPersistPipeline:
                 url=item["url"],
                 http_status=item["status"],
                 time_retrieved=item["time_retrieved"],
-                time_loc = item["time_loc"],
-                time_header = item["time_header"],
+                time_loc=item["time_loc"],
+                time_header=item["time_header"],
                 jsonld=item["jsonld"],
             )
             exists = self._session.query(soscan.models.SOContent).get(soitem.url)
