@@ -69,6 +69,10 @@ normalization of the content.
 
 ## Operation
 
+The spider crawls entries in a sitemaps, loads pages, extracts
+JSON-LD from each page, normalizes the JSON-LD, and stores the
+results in a postgres table.
+
 Example, retrieve from BCO-DMO:
 
 ----
@@ -81,6 +85,13 @@ Example, retrieve from Dryad:
 ----
 scrapy crawl JsonldSpider \
   -a sitemap_urls="https://datadryad.org/sitemap.xml"
+----
+
+or both in parallel (space delimited sitemap URLs to crawl):
+
+----
+scrapy crawl JsonldSpider \
+  -a sitemap_urls="https://datadryad.org/sitemap.xml https://www.bco-dmo.org/sitemap.xml"
 ----
 
 ### Query notes
