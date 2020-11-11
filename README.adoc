@@ -18,10 +18,8 @@ Dependencies:
 
 Complete python dependencies are listed in `pyproject.toml`.
 
-[NOTE]
 Installing psycopg2 on OS X can be a bit cumbersome. With a brew
 installed postgresql, this worked for me:
-
 ----
 env LDFLAGS='-L/usr/local/lib -L/usr/local/opt/openssl/lib -L/usr/local/opt/readline/lib' poetry add psycopg2
 ----
