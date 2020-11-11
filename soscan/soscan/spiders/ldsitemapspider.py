@@ -7,7 +7,6 @@ The sitemap loc lastmod property is provided in the request meta
 
 import re
 import logging
-
 from scrapy.spiders import Spider
 from scrapy.http import Request, XmlResponse
 from scrapy.utils.sitemap import Sitemap, sitemap_urls_from_robots
@@ -18,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 class LDSitemapSpider(Spider):
+    """
+    Provides a generic sitemap spider. It handles gzipped and recursion.
+    """
 
     name = "LDSitemapSpider"
     sitemap_urls = ()
