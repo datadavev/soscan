@@ -5,6 +5,8 @@ Spider for scanning and retrieving schema.org content.
 Extracted schema.org markup is stored to postgres as a `JSONB` field in
 a single table `socontent`. Document URL is used as the primary key.
 
+The JSON LD is normalized to always be an array of graphs. This helps
+to facilitate consistent access to the stored JSON.
 
 ## Installation
 
@@ -34,7 +36,7 @@ cd soscan
 poetry install
 ----
 
-Creating the database:
+Create the database:
 ----
 psql
 CREATE DATABASE soscan;
@@ -42,16 +44,103 @@ CREATE USER soscanrw;
 GRANT ALL PRIVILEGES ON DATABASE soscan TO soscanrw;
 ----
 
-Configuration:
-----
-----
 
 ## Operation
 
+Example, retrieve from BCO-DMO:
+
+----
+scrapy crawl JsonldSpider \
+  -a sitemap_urls="https://www.bco-dmo.org/sitemap.xml"
+----
+
+Example, retrieve from Dryad:
+
+----
+scrapy crawl JsonldSpider \
+  -a sitemap_urls="https://datadryad.org/sitemap.xml"
+----
+
+### Query notes
+
+Note that the following are all working on the first `@graph` in the jsonld. The
+number of entries in `@graph` can be found by:
+
+----
+select count(*), jsonb_array_length(jsonld->'@graph') as G from socontent group by G;
+
+ count | g
+-------+---
+   782 | 1
+----
+
+Types of things that we collected:
+
+----
+select count(*),  jsonld->'@graph'->0->'@type' as T
+  from socontent
+  group by T
+  order by T;
+
+ count |        t
+-------+-----------------
+    54 | Dataset
+     2 | Event
+    43 | MonetaryGrant
+    24 | ResearchProject
+----
+
+Same but different:
+
+----
+select count(*), jsonb_extract_path_text(jsonld,'@graph','0','@type') as T
+  from socontent
+  group by T
+  order by T;
+
+ count |        t
+-------+-----------------
+    54 | Dataset
+     2 | Event
+    43 | MonetaryGrant
+    24 | ResearchProject
+----
+
+List `variableMeasured` names:
+
+----
+select distinct
+  jsonb_array_elements(jsonld->'@graph'->0->'variableMeasured')->'name' as var
+  from socontent
+  where jsonb_array_length(jsonld->'@graph'->0->'variableMeasured') > 0
+  order by var;
+
+                                     var
+------------------------------------------------------------------------------
+ "19'-butanoyloxyfucoxanthin"
+ "19'-hexanoyloxyfucoxanthin"
+ "??"
+ "Additional notes"
+ "Additional notes/collected organisms"
+ "Aggregate mass of all 4 edge or interior clusters collected from that cage"
+ "Alloxanthin"
+ "Alpha-carotene"
+ "Ammonium."
+...
+ "volume filtered"
+ "volume filtered; i.e. how much water went through the net"
+ "warnings and comments from SAP run"
+ "water depth at the station according to depth sounder on vessel"
+ "which instrument was used"
+ "year"
+ "zooplankton dry weight"
+(547 rows)
+----
 
 ## Development
 
 TODO:
 
-* normalize extracted SO
 * restart interrupted scan
+* Filter by properties such as `@type`
+

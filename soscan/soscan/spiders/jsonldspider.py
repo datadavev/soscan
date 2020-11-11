@@ -1,12 +1,10 @@
-import datetime
 import pyld
 import email.utils
-
+import dateparser
 import soscan.spiders.ldsitemapspider
 import soscan.items
 import soscan.utils
 
-from pprint import pprint
 
 class JsonldSpider(soscan.spiders.ldsitemapspider.LDSitemapSpider):
 
@@ -19,13 +17,11 @@ class JsonldSpider(soscan.spiders.ldsitemapspider.LDSitemapSpider):
 
     def sitemap_filter(self, entries):
         for entry in entries:
-            pprint(entry)
+            # pprint(entry)
             # print(f"ENTRY DT = {entry.get('lastmod')}")
             yield entry
 
     def parse(self, response, **kwargs):
-        # print(f"URL = {response.url}")
-        # print(f"TS = {response.request.meta['loc_timestamp']}")
         try:
             jsonld = pyld.jsonld.load_html(
                 response.body, response.url, None, {"extractAllScripts": True}
@@ -35,14 +31,21 @@ class JsonldSpider(soscan.spiders.ldsitemapspider.LDSitemapSpider):
                 item["url"] = response.url
                 item["status"] = response.status
                 item["jsonld"] = jsonld
-                item["time_loc"] = response.meta['loc_timestamp']
+                item["time_loc"] = dateparser.parse(
+                    response.meta["loc_timestamp"],
+                    settings={"RETURN_AS_TIMEZONE_AWARE": True},
+                )
                 item["time_header"] = None
-                response_date = response.headers.get('Date', None)
+                response_date = response.headers.get("Date", None)
                 if response_date is not None:
                     try:
-                        item["time_header"] = email.utils.parsedate_to_datetime(response_date.decode())
+                        item["time_header"] = email.utils.parsedate_to_datetime(
+                            response_date.decode()
+                        )
                     except Exception as e:
-                        self.logger.error("Could not parse time: %s. %s", response_date, e)
+                        self.logger.error(
+                            "Could not parse time: %s. %s", response_date, e
+                        )
                 item["time_retrieved"] = soscan.utils.dtnow()
                 yield item
         except Exception as e:
