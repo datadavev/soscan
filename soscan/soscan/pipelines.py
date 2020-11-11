@@ -88,7 +88,19 @@ class SoscanPersistPipeline:
         if self._engine is None:
             return
         self._session = soscan.models.getSession(self._engine)
-        # TODO: check in database for most recent date of entry
+        # If the spider does not have a lastmod_filter, then
+        # get the most recent lastmod from the database, and
+        # set the spider lastmod_filter to that time. A re-harvest
+        # can be done by setting the lastmod property to an old
+        # date.
+        if spider.lastmod_filter is None:
+            rec = (
+                self._session.query(soscan.models.SOContent)
+                .order_by(soscan.models.SOContent.time_loc.desc())
+                .first()
+            )
+            spider.lastmod_filter = rec.time_loc
+            self.logger.debug("Set crawl start date to: %s", rec.time_loc)
 
     def close_spider(self, spider):
         self.logger.debug("close_spider")
@@ -113,7 +125,9 @@ class SoscanPersistPipeline:
                         merged = self._session.merge(soitem)
                         self._session.commit()
                     except Exception as e:
-                        self.logger.warning("Could not merge '%s' because %s", soitem.url, e)
+                        self.logger.warning(
+                            "Could not merge '%s' because %s", soitem.url, e
+                        )
             else:
                 self.logger.debug("NEW content: %s", soitem.url)
                 try:

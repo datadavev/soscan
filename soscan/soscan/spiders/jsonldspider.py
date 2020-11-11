@@ -9,19 +9,72 @@ import soscan.utils
 class JsonldSpider(soscan.spiders.ldsitemapspider.LDSitemapSpider):
 
     name = "JsonldSpider"
-    # sitemap_urls = ['https://www.bco-dmo.org/sitemap.xml',]
 
-    def __init__(self, sitemap_urls="", *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        """
+        Extracts JSON-LD from sitemap locations.
+
+        Args:
+            *args:
+            **kwargs:
+                sitemap_urls: space delimited list of sitemap URLs
+                lastmod: optional datetime string. Entries equal
+                         to or older are excluded.
+        """
         super(JsonldSpider, self).__init__(*args, **kwargs)
-        self.sitemap_urls = sitemap_urls.split(" ")
+        urls = kwargs.get("sitemap_urls")
+        self.sitemap_urls = urls.split(" ")
+        self.lastmod_filter = kwargs.get("lastmod", None)
+        if len(self.sitemap_urls) < 1:
+            raise ValueError("At least one sitemap URL is required.")
+        if self.lastmod_filter is not None:
+            self.lastmod_filter = dateparser.parse(
+                self.lastmod_filter, settings={"RETURN_AS_TIMEZONE_AWARE": True}
+            )
 
     def sitemap_filter(self, entries):
+        """
+        Filter loc entries by lastmod time.
+
+        If lastmod_filter is specified for the spider, then
+        reject entries that do not have a lastmod value or
+        the lastmod value is older than the lastmod_filter value.
+
+        Also converts the entry['lastmod'] value to a
+        timezone aware datetime value.
+
+        Args:
+            entries: iterator of Sitemap entries
+
+        Returns: None
+        """
         for entry in entries:
-            # pprint(entry)
-            # print(f"ENTRY DT = {entry.get('lastmod')}")
-            yield entry
+            ts = entry.get("lastmod", None)
+            if not ts is None:
+                # convert TS to a datetime for comparison
+                ts = dateparser.parse(
+                    ts,
+                    settings={"RETURN_AS_TIMEZONE_AWARE": True},
+                )
+                # preserve the converted timestamp in the entry
+                entry["lastmod"] = ts
+
+            if self.lastmod_filter is not None and ts is not None:
+                if ts > self.lastmod_filter:
+                    yield entry
+            else:
+                yield entry
 
     def parse(self, response, **kwargs):
+        """
+        Loads JSON-LD from the response document
+
+        Args:
+            response: scrapy response document
+            **kwargs:
+
+        Returns: yields the item or None
+        """
         try:
             jsonld = pyld.jsonld.load_html(
                 response.body, response.url, None, {"extractAllScripts": True}
@@ -31,10 +84,7 @@ class JsonldSpider(soscan.spiders.ldsitemapspider.LDSitemapSpider):
                 item["url"] = response.url
                 item["status"] = response.status
                 item["jsonld"] = jsonld
-                item["time_loc"] = dateparser.parse(
-                    response.meta["loc_timestamp"],
-                    settings={"RETURN_AS_TIMEZONE_AWARE": True},
-                )
+                item["time_loc"] = response.meta["loc_timestamp"]
                 item["time_modified"] = None
                 response_date = response.headers.get("Last-Modified", None)
                 if response_date is not None:

@@ -201,6 +201,5 @@ select distinct
 
 TODO:
 
-* restart interrupted scan
 * Filter by properties such as `@type`
 
