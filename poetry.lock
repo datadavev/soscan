@@ -564,7 +564,7 @@ name = "jsonschema"
 version = "3.2.0"
 description = "An implementation of JSON Schema validation for Python"
 category = "main"
-optional = true
+optional = false
 python-versions = "*"
 
 [package.dependencies]
@@ -1312,7 +1312,7 @@ name = "pyrsistent"
 version = "0.17.3"
 description = "Persistent/Functional/Immutable data structures"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.5"
 
 [[package]]
@@ -2042,7 +2042,7 @@ docs = ["numpy", "sphinx", "graphviz", "pandoc", "sphinx-material", "sphinxcontr
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "f3e795ee5ebebb0ec12b2d70471da98ed5c43291ad332a79a76d910da1377fd7"
+content-hash = "908e82220bbbbae6d417cc9c786314ed1d4687a7b46bbd3a84fe6662d989f5cf"
 
 [metadata.files]
 alabaster = [

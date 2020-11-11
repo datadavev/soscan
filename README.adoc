@@ -8,6 +8,11 @@ a single table `socontent`. Document URL is used as the primary key.
 The JSON LD is normalized to always be an array of graphs. This helps
 to facilitate consistent access to the stored JSON.
 
+JSON-LD is extracted only from the content retrieved from the URL. Extraction
+from client side rendered content is not supported though is straight forward
+to support using Selenium.
+
+
 ## Installation
 
 Dependencies:
@@ -94,7 +99,27 @@ scrapy crawl JsonldSpider \
   -a sitemap_urls="https://datadryad.org/sitemap.xml https://www.bco-dmo.org/sitemap.xml"
 ----
 
-### Query notes
+## JSON-LD Normalization
+
+The extracted json-ld is normalized at a high level with a structure that follows:
+
+----
+{
+    "@context": {
+        "@vocab":"https://schema.org/"
+    },
+    "@graph":[
+        {
+            "@id":"id for graph 1",
+            "@type":"type for graph 1",
+            ...
+        },
+        ...
+    ]
+}
+----
+
+## Query notes
 
 The number of entries in `@graph` can be found by:
 
@@ -107,7 +132,7 @@ select count(*), jsonb_array_length(jsonld->'@graph') as G from socontent group 
 ----
 
 [NOTE]
-The following examples all work on the first `@graph` in the jsonld.
+The following examples all operate on the first `@graph` in the jsonld (zeroth index).
 
 Types of things that we collected:
 
